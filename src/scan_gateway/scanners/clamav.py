@@ -23,11 +23,35 @@ class ClamAVScanner:
     name = "clamav"
 
     def __init__(self, host: str, port: int = 3310, timeout_seconds: float = 15):
+        """Configure a scanner for a clamd instance reachable at host:port.
+
+        Args:
+            host: Hostname or IP of the clamd instance.
+            port: TCP port clamd listens on. Defaults to 3310.
+            timeout_seconds: Seconds to wait for a response before raising
+                ScannerUnavailableError. Defaults to 15.
+
+        Returns:
+            None.
+        """
         self._host = host
         self._port = port
         self._timeout_seconds = timeout_seconds
 
     async def scan(self, path: Path) -> None:
+        """Stream `path` to clamd via INSTREAM and raise on a positive match.
+
+        Args:
+            path: Filesystem path of the file to scan.
+
+        Returns:
+            None if clamd reports the file clean.
+
+        Raises:
+            ThreatDetectedError: If clamd's verdict isn't "OK".
+            ScannerUnavailableError: If the connection times out or fails,
+                or clamd's response can't be parsed.
+        """
         try:
             verdict = await asyncio.wait_for(
                 self._scan_via_clamd(path), timeout=self._timeout_seconds
@@ -41,6 +65,17 @@ class ClamAVScanner:
             raise ThreatDetectedError(self.name, verdict)
 
     async def _scan_via_clamd(self, path: Path) -> str:
+        """Speak ClamAV's zINSTREAM protocol over a fresh TCP connection.
+
+        Args:
+            path: Filesystem path of the file to stream to clamd.
+
+        Returns:
+            str: "OK" if clean, or clamd's own FOUND/signature text if flagged.
+
+        Raises:
+            RuntimeError: If clamd's response contains neither "OK" nor "FOUND".
+        """
         reader, writer = await asyncio.open_connection(self._host, self._port)
         try:
             writer.write(b"zINSTREAM\0")

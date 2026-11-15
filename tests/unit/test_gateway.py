@@ -109,9 +109,7 @@ async def test_discover_plugins_false_disables_discovery(tmp_path, monkeypatch):
 async def test_explicit_scanners_run_before_discovered_plugins(tmp_path, monkeypatch):
     explicit = CleanScanner("explicit")
     discovered = CleanScanner("discovered")
-    monkeypatch.setattr(
-        "scan_gateway.gateway.discover_scanner_plugins", lambda: [discovered]
-    )
+    monkeypatch.setattr("scan_gateway.gateway.discover_scanner_plugins", lambda: [discovered])
 
     gateway = ScanGateway(scanners=[explicit], discover_plugins=True)
     assert gateway._scanners == [explicit, discovered]

@@ -33,9 +33,7 @@ pytestmark = pytest.mark.skipif(
 
 
 async def test_eicar_flagged_by_real_clamav(tmp_path):
-    eicar_bytes = (
-        rb"X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
-    )
+    eicar_bytes = rb"X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
     path = tmp_path / "eicar.txt"
     path.write_bytes(eicar_bytes)
 

@@ -22,6 +22,15 @@ class ThreatDetectedError(ScanGatewayError):
     internals."""
 
     def __init__(self, scanner_name: str, verdict: str):
+        """Initialize with the flagging scanner's name and its verdict.
+
+        Args:
+            scanner_name: The flagging Scanner's `.name`.
+            verdict: That scanner's own description of what it found.
+
+        Returns:
+            None.
+        """
         self.scanner_name = scanner_name
         self.verdict = verdict
         super().__init__(f"{scanner_name} flagged: {verdict}")
@@ -34,6 +43,16 @@ class ScannerUnavailableError(ScanGatewayError):
     not expected to reach the consuming app directly."""
 
     def __init__(self, scanner_name: str, reason: str):
+        """Initialize with the unavailable scanner's name and why.
+
+        Args:
+            scanner_name: The unavailable Scanner's `.name`.
+            reason: A human-readable description of why the scan couldn't
+                be completed (e.g. a connection error or timeout message).
+
+        Returns:
+            None.
+        """
         self.scanner_name = scanner_name
         self.reason = reason
         super().__init__(f"{scanner_name} unavailable: {reason}")
