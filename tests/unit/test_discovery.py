@@ -9,9 +9,7 @@ import pytest
 
 from scan_gateway.discovery import ENTRY_POINT_GROUP, discover_scanner_plugins
 
-_fake_plugin_installed = any(
-    ep.name == "fake" for ep in entry_points(group=ENTRY_POINT_GROUP)
-)
+_fake_plugin_installed = any(ep.name == "fake" for ep in entry_points(group=ENTRY_POINT_GROUP))
 
 
 def test_loads_a_valid_entry_point(monkeypatch):
@@ -21,7 +19,8 @@ def test_loads_a_valid_entry_point(monkeypatch):
         group=ENTRY_POINT_GROUP,
     )
     monkeypatch.setattr(
-        "scan_gateway.discovery.entry_points", lambda group: [ep] if group == ENTRY_POINT_GROUP else []
+        "scan_gateway.discovery.entry_points",
+        lambda group: [ep] if group == ENTRY_POINT_GROUP else [],
     )
 
     discovered = discover_scanner_plugins()
@@ -35,7 +34,9 @@ def test_skips_an_entry_point_that_fails_to_load(monkeypatch):
         name="broken", value="nonexistent.module:DoesNotExist", group=ENTRY_POINT_GROUP
     )
     good = EntryPoint(
-        name="dummy", value="tests.unit.test_discovery:_DummyScannerFactory", group=ENTRY_POINT_GROUP
+        name="dummy",
+        value="tests.unit.test_discovery:_DummyScannerFactory",
+        group=ENTRY_POINT_GROUP,
     )
     monkeypatch.setattr(
         "scan_gateway.discovery.entry_points",

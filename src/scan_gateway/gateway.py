@@ -21,26 +21,46 @@ class ScanGateway:
         discover_plugins: bool = True,
         fallback: Scanner | None = None,
     ):
-        """`scanners` are explicitly-registered instances -- e.g. this app's
-        own ClamAVScanner, constructed with real host/port/secrets -- and
-        run first, in the given order. When `discover_plugins` is True
-        (default), third-party plugins registered under the
-        "scan_gateway.scanners" entry-point group are appended after them,
-        in whatever order importlib.metadata returns (not guaranteed
-        stable). `fallback` overrides the built-in local heuristic scanner;
-        almost never needed outside tests."""
+        """Build an orchestrator over explicit and/or auto-discovered scanners.
+
+        Args:
+            scanners: Explicitly-registered instances -- e.g. this app's own
+                ClamAVScanner, constructed with real host/port/secrets --
+                run first, in the given order.
+            discover_plugins: When True (default), third-party plugins
+                registered under the "scan_gateway.scanners" entry-point
+                group are appended after `scanners`, in whatever order
+                importlib.metadata returns (not guaranteed stable).
+            fallback: Overrides the built-in local heuristic scanner;
+                almost never needed outside tests.
+
+        Returns:
+            None.
+        """
         self._scanners: list[Scanner] = list(scanners or [])
         if discover_plugins:
             self._scanners.extend(discover_scanner_plugins())
         self._fallback = fallback or LocalHeuristicScanner()
 
     async def scan(self, path: Path) -> None:
-        """Raise ThreatDetectedError if `path` is flagged by any configured
-        scanner or, failing that, the built-in local fallback.
-        ScannerUnavailableError from the fallback itself propagates
-        uncaught -- if nothing could scan the file at all, that's a hard
-        failure for the caller to decide about, not a silent pass. Clean
-        returns None -- callers don't need to know which layer scanned it."""
+        """Scan `path` through every configured scanner, falling back to the
+        built-in local scanner when none of them can complete the scan.
+
+        Args:
+            path: Filesystem path of the file to scan.
+
+        Returns:
+            None if the file is clean -- callers don't need to know which
+            layer scanned it.
+
+        Raises:
+            ThreatDetectedError: If any configured scanner or the fallback
+                flags the file.
+            ScannerUnavailableError: If the fallback itself can't complete
+                the scan -- propagates uncaught, since that means nothing
+                could scan the file at all, a hard failure for the caller
+                to decide about, not a silent pass.
+        """
         for scanner in self._scanners:
             try:
                 await scanner.scan(path)
@@ -50,7 +70,9 @@ class ScanGateway:
                 continue
 
         if self._scanners:
-            logger.warning("no configured scanner could complete a scan for %s, using local fallback", path)
+            logger.warning(
+                "no configured scanner could complete a scan for %s, using local fallback", path
+            )
         else:
             logger.info("no scanner configured, using local fallback scan for %s", path)
         await self._fallback.scan(path)

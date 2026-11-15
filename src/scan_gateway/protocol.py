@@ -14,7 +14,17 @@ class Scanner(Protocol):
     name: str
 
     async def scan(self, path: Path) -> None:
-        """Raise ThreatDetectedError if `path` is flagged, or
-        ScannerUnavailableError if the scan couldn't be completed for
-        operational reasons. Return None if clean."""
+        """Scan `path` and report the result.
+
+        Args:
+            path: Filesystem path of the file to scan.
+
+        Returns:
+            None if the file is clean.
+
+        Raises:
+            ThreatDetectedError: If `path` is flagged.
+            ScannerUnavailableError: If the scan couldn't be completed for
+                operational reasons.
+        """
         ...

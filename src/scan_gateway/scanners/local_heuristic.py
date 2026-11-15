@@ -30,6 +30,19 @@ class LocalHeuristicScanner:
     name = "local-heuristic"
 
     async def scan(self, path: Path) -> None:
+        """Check `path` against the bundled YARA rules and keyword heuristics.
+
+        Args:
+            path: Filesystem path of the file to scan.
+
+        Returns:
+            None if nothing matches.
+
+        Raises:
+            ThreatDetectedError: If a YARA rule matches, a `/Launch` action
+                is present, or a script action is paired with an
+                auto-trigger action.
+        """
         data = path.read_bytes()
 
         matches = _rules.match(data=data)

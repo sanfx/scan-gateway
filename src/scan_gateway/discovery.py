@@ -11,21 +11,30 @@ logger = logging.getLogger(__name__)
 
 
 def discover_scanner_plugins() -> list[Scanner]:
-    """Load every Scanner registered under the "scan_gateway.scanners" entry-point
-    group. Each entry point must resolve to a zero-argument callable (a class
-    with no required constructor args, or a factory function) returning a
+    """Load every Scanner registered under the "scan_gateway.scanners" entry-point group.
+
+    Each entry point must resolve to a zero-argument callable (a class with
+    no required constructor args, or a factory function) returning a
     Scanner instance -- any config it needs (host, API key, etc) is the
     plugin's own responsibility to read, e.g. from its own environment
-    variables. A plugin that fails to import or instantiate is logged and
-    skipped, not fatal -- one broken third-party plugin shouldn't take down
-    every scan."""
+    variables.
+
+    Returns:
+        list[Scanner]: One instance per successfully-loaded entry point, in
+        whatever order importlib.metadata returns them (not guaranteed
+        stable). An entry point that fails to import or instantiate is
+        logged and skipped, not fatal -- one broken third-party plugin
+        shouldn't take down every scan.
+    """
     discovered: list[Scanner] = []
     for ep in entry_points(group=ENTRY_POINT_GROUP):
         try:
             factory = ep.load()
             scanner = factory()
         except Exception:
-            logger.exception("scan-gateway plugin %r (%s) failed to load, skipping", ep.name, ep.value)
+            logger.exception(
+                "scan-gateway plugin %r (%s) failed to load, skipping", ep.name, ep.value
+            )
             continue
         discovered.append(scanner)
     return discovered
