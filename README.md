@@ -146,7 +146,9 @@ on `main`:
    `CHANGELOG.md` up to date.
 2. Merging that release PR creates a GitHub Release + tag.
 3. The Release publishing triggers `.github/workflows/python-publish.yml`,
-   which builds the sdist/wheel and publishes to PyPI.
+   which builds the sdist/wheel and publishes to PyPI via [Trusted
+   Publishing](https://docs.pypi.org/trusted-publishers/) (OIDC) -- no
+   stored API token.
 
 This means every commit to `main` should use a Conventional Commits prefix
 for version bumps to compute correctly.
