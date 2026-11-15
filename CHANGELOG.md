@@ -1,5 +1,19 @@
 # Changelog
 
+## [0.1.1](https://github.com/sanfx/scan-gateway/compare/v0.1.0...v0.1.1) (2026-11-15)
+
+
+### Bug Fixes
+
+* **ci:** run PyPI publish in the same workflow as release-please ([20970be](https://github.com/sanfx/scan-gateway/commit/20970bee348cb00cc96cf22335696212365733a6))
+* **ci:** run PyPI publish in the same workflow as release-please ([c8f8d61](https://github.com/sanfx/scan-gateway/commit/c8f8d614fbd8671023df95966e3e1cedfa7757d0))
+
+
+### Documentation
+
+* add Returns/Args/Raises sections to every docstring ([5f6174b](https://github.com/sanfx/scan-gateway/commit/5f6174bb80fa999921d0925709f52db382cdf0b0))
+* add Returns/Args/Raises sections to every docstring ([29c79d4](https://github.com/sanfx/scan-gateway/commit/29c79d4d93581b681079b03e38d0b0ba6bc7c8d7))
+
 ## 0.1.0 (2026-11-15)
 
 
