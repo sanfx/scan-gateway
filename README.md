@@ -144,11 +144,15 @@ on `main`:
    (`feat:` → minor, `fix:` → patch, `BREAKING CHANGE:`/`!` → major), and
    keeps a standing "release PR" with the version bump and generated
    `CHANGELOG.md` up to date.
-2. Merging that release PR creates a GitHub Release + tag.
-3. The Release publishing triggers `.github/workflows/python-publish.yml`,
-   which builds the sdist/wheel and publishes to PyPI via [Trusted
-   Publishing](https://docs.pypi.org/trusted-publishers/) (OIDC) -- no
-   stored API token.
+2. Merging that release PR creates a GitHub Release + tag, which sets
+   `release-please`'s own `release_created` output.
+3. A second job in the same `.github/workflows/release-please.yml`,
+   gated on that output, builds the sdist/wheel and publishes to PyPI via
+   [Trusted Publishing](https://docs.pypi.org/trusted-publishers/) (OIDC)
+   -- no stored API token. (Publishing has to live in the *same* workflow
+   as release-please itself, not a separate workflow triggered by `on:
+   release:` -- a Release created via the default `GITHUB_TOKEN` doesn't
+   fire other workflows, by GitHub's own anti-recursion design.)
 
 This means every commit to `main` should use a Conventional Commits prefix
 for version bumps to compute correctly.
