@@ -1,3 +1,5 @@
+<img src="logo.png" align="right" width="140" alt="scan-gateway logo" />
+
 # scan-gateway
 
 A pluggable malware-scan orchestrator for file uploads: tries configured
@@ -110,6 +112,12 @@ change out from under a deployment.
 | `ScanGatewayError` | Base class for everything this package raises | -- |
 | `ThreatDetectedError` | A scanner positively flagged the file. Carries `.scanner_name` and `.verdict` | Any `Scanner` |
 | `ScannerUnavailableError` | A scanner couldn't complete the scan for operational reasons. Carries `.scanner_name` and `.reason` | Any `Scanner`; caught internally by `ScanGateway`, not expected to reach your code directly |
+
+## Contributing
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for dev setup, commit conventions
+(required for automated releases), and what belongs in core vs. a scanner
+module.
 
 ## Development
 
