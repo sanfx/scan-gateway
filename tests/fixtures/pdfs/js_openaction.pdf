@@ -1,0 +1,10 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R /OpenAction 4 0 R >>
+endobj
+4 0 obj
+<< /S /JavaScript /JS (app.alert\('hi'\);) >>
+endobj
+trailer
+<< /Root 1 0 R >>
+%%EOF
