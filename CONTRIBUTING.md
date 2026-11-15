@@ -7,6 +7,17 @@ don't need any of this — see the [README's "Writing a scanner
 plugin"](README.md#writing-a-scanner-plugin) section instead; a plugin is
 its own separate package and doesn't touch this repo at all.
 
+## Requirements for every PR
+
+- **Lint/format with [ruff](https://docs.astral.sh/ruff/)** -- `ruff
+  check .` and `ruff format .` must both pass with no changes left
+  uncommitted. This is the one linter/formatter for the whole repo; don't
+  introduce another.
+- **Use [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/)**
+  for every commit message (or at minimum the PR title, since PRs are
+  squash-merged) -- see "Commit messages" below for why this isn't just a
+  style preference here.
+
 ## Dev setup
 
 ```bash
@@ -34,7 +45,8 @@ All three must pass before opening a PR. CI runs the same checks.
 Releases are fully automated by [release-please](https://github.com/googleapis/release-please),
 which reads commit prefixes on `main` to decide the next version and
 generate `CHANGELOG.md`. Every commit (or at minimum, every squashed PR
-title) must use one of:
+title) must follow the [Conventional Commits spec](https://www.conventionalcommits.org/en/v1.0.0/),
+using one of:
 
 | Prefix | Effect |
 |---|---|
