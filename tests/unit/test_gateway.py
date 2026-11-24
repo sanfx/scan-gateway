@@ -106,6 +106,49 @@ async def test_discover_plugins_false_disables_discovery(tmp_path, monkeypatch):
     assert fallback.called
 
 
+async def test_on_degraded_called_with_scanner_name_and_reason(tmp_path):
+    calls = []
+    unavailable = UnavailableScanner("down")
+    clean = CleanScanner("up")
+    gateway = ScanGateway(
+        scanners=[unavailable, clean],
+        discover_plugins=False,
+        on_degraded=lambda name, reason: calls.append((name, reason)),
+    )
+
+    await gateway.scan(tmp_path / "f.pdf")
+
+    assert calls == [("down", "connection refused")]
+
+
+async def test_on_degraded_not_called_when_first_scanner_succeeds(tmp_path):
+    calls = []
+    clean = CleanScanner("up")
+    gateway = ScanGateway(
+        scanners=[clean], discover_plugins=False, on_degraded=lambda *args: calls.append(args)
+    )
+
+    await gateway.scan(tmp_path / "f.pdf")
+
+    assert calls == []
+
+
+async def test_on_degraded_exception_does_not_break_fallback_scan(tmp_path):
+    unavailable = UnavailableScanner("down")
+    fallback = CleanScanner("fallback")
+
+    def _boom(scanner_name, reason):
+        raise RuntimeError("metrics backend down too")
+
+    gateway = ScanGateway(
+        scanners=[unavailable], discover_plugins=False, fallback=fallback, on_degraded=_boom
+    )
+
+    await gateway.scan(tmp_path / "f.pdf")  # must not raise
+
+    assert fallback.called
+
+
 async def test_explicit_scanners_run_before_discovered_plugins(tmp_path, monkeypatch):
     explicit = CleanScanner("explicit")
     discovered = CleanScanner("discovered")
