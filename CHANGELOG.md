@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.0](https://github.com/sanfx/scan-gateway/compare/v0.1.1...v0.2.0) (2026-11-24)
+
+
+### Features
+
+* add on_degraded callback for scanner-fallback observability ([5d70adf](https://github.com/sanfx/scan-gateway/commit/5d70adf803471ae33716f4792da5dc8ac97eac5b))
+* add on_degraded callback to ScanGateway for scanner-fallback observability ([1ddd0d9](https://github.com/sanfx/scan-gateway/commit/1ddd0d9dd34ce56226944a88da2bb98d6d60a904))
+
 ## [0.1.1](https://github.com/sanfx/scan-gateway/compare/v0.1.0...v0.1.1) (2026-11-15)
 
 
