@@ -3,6 +3,7 @@ any auto-discovered plugins, falling back to the built-in local heuristic
 scanner when none of them can complete a scan."""
 
 import logging
+from collections.abc import Callable
 from pathlib import Path
 
 from scan_gateway.discovery import discover_scanner_plugins
@@ -20,6 +21,7 @@ class ScanGateway:
         *,
         discover_plugins: bool = True,
         fallback: Scanner | None = None,
+        on_degraded: Callable[[str, str], None] | None = None,
     ):
         """Build an orchestrator over explicit and/or auto-discovered scanners.
 
@@ -33,6 +35,15 @@ class ScanGateway:
                 importlib.metadata returns (not guaranteed stable).
             fallback: Overrides the built-in local heuristic scanner;
                 almost never needed outside tests.
+            on_degraded: Optional callback invoked as `(scanner_name, reason)`
+                each time a configured scanner raises ScannerUnavailableError
+                and scanning falls through to the next scanner / the local
+                fallback. Synchronous and best-effort -- an exception raised
+                by the callback itself is logged and swallowed, never
+                allowed to turn a successful fallback scan into a failure.
+                Lets a consumer surface "a scanner has been down for N
+                scans" as its own metric/alert without this package needing
+                to know about any particular metrics backend.
 
         Returns:
             None.
@@ -41,6 +52,7 @@ class ScanGateway:
         if discover_plugins:
             self._scanners.extend(discover_scanner_plugins())
         self._fallback = fallback or LocalHeuristicScanner()
+        self._on_degraded = on_degraded
 
     async def scan(self, path: Path) -> None:
         """Scan `path` through every configured scanner, falling back to the
@@ -67,6 +79,11 @@ class ScanGateway:
                 return  # first clean/flagged outcome wins -- no need to run the rest
             except ScannerUnavailableError as exc:
                 logger.warning("scanner %r unavailable (%s), trying next", scanner.name, exc.reason)
+                if self._on_degraded is not None:
+                    try:
+                        self._on_degraded(scanner.name, exc.reason)
+                    except Exception:
+                        logger.exception("on_degraded callback raised; ignoring")
                 continue
 
         if self._scanners:
