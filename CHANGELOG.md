@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.2.1](https://github.com/sanfx/scan-gateway/compare/v0.2.0...v0.2.1) (2026-11-25)
+
+
+### Bug Fixes
+
+* stop local-heuristic false-flagging benign PDFs via structural parsing ([6128ca2](https://github.com/sanfx/scan-gateway/commit/6128ca268b173463834802dc7c6c35eef595c015))
+* stop local-heuristic false-flagging benign PDFs via structural parsing ([f9b2197](https://github.com/sanfx/scan-gateway/commit/f9b21970a393839adca28ba47c1bc2c0c4b0c8f7))
+
 ## [0.2.0](https://github.com/sanfx/scan-gateway/compare/v0.1.1...v0.2.0) (2026-11-24)
 
 
